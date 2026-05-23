@@ -1,13 +1,13 @@
 # Backend Node.js + Express + MySQL — Docker puro (sin docker-compose)
 
-## Estructura del proyecto
+## Estructura actual del proyecto
 
 ```
-backend/
-├── Dockerfile          ← Define la imagen del backend
-├── package.json        ← Dependencias Node.js
-└── src/
-    └── index.js        ← Aplicación Express
+TP1-Docker-main/
+├── Dockerfile
+├── package.json
+├── index.js
+└── README.md
 ```
 
 ---
@@ -20,7 +20,7 @@ backend/
 | **Puerto** | `EXPOSE 3000` en Dockerfile + `-p 3000:3000` en docker run |
 | **Red Docker** | `docker network create` + `--network` en ambos contenedores |
 | **Volumen de datos** | `-v mysql-data:/var/lib/mysql` — persiste los datos de MySQL |
-| **Ruta del host** | `-v $(pwd)/src:/app/src` — monta código local en el contenedor |
+| **Ruta del host (opcional, desarrollo)** | `-v "$(pwd)/index.js:/app/index.js"` — monta el código local en el contenedor |
 | **Variables de entorno** | `-e DB_HOST=...` — credenciales sin hardcodear |
 
 ---
@@ -41,16 +41,13 @@ docker network create mi-red-backend
 ### 2. Levantar MySQL
 
 ```bash
-docker run -d \
-  --name mysql-db \
-  --network mi-red-backend \
-  -e MYSQL_ROOT_PASSWORD=changeme \
+docker run -d --name mysql-db --network mi-red-backend \
+  -e MYSQL_ROOT_PASSWORD=alumnoipm \
   -e MYSQL_DATABASE=appdb \
   -e MYSQL_USER=appuser \
   -e MYSQL_PASSWORD=apppass \
   -v mysql-data:/var/lib/mysql \
-  -p 3307:3306 \
-  mysql:8.0
+  -p 3307:3306 mysql:8.0
 ```
 
 **Explicación de cada flag:**
@@ -80,18 +77,25 @@ docker build -t backend-node .
 ### 4. Levantar el backend
 
 ```bash
-docker run -d \
-  --name backend-api \
-  --network mi-red-backend \
+docker run -d --name backend-api --network mi-red-backend \
   -e DB_HOST=mysql-db \
   -e DB_PORT=3306 \
   -e DB_USER=appuser \
   -e DB_PASSWORD=apppass \
   -e DB_NAME=appdb \
   -e PORT=3000 \
-  -v $(pwd)/src:/app/src \
-  -p 3000:3000 \
-  backend-node
+  -p 3000:3000 backend-node
+```
+
+Este comando es ideal para la demo porque ejecuta exactamente la imagen construida.
+
+Si querés modo desarrollo (reflejar cambios locales sin rebuild), podés montar solo `index.js`:
+
+```bash
+docker run -d --name backend-api --network mi-red-backend \
+  -e DB_HOST=mysql-db -e DB_PORT=3306 -e DB_USER=appuser -e DB_PASSWORD=apppass -e DB_NAME=appdb -e PORT=3000 \
+  -v "$(pwd)/index.js:/app/index.js" \
+  -p 3000:3000 backend-node
 ```
 
 **Explicación de cada flag:**
@@ -104,8 +108,8 @@ docker run -d \
 | `-v $(pwd)/src:/app/src` | **Ruta del host** montada en el contenedor (útil en desarrollo: cambios en tu PC se reflejan sin rebuild) |
 | `-p 3000:3000` | `PUERTO_HOST:PUERTO_CONTENEDOR` — accedés desde `localhost:3000` |
 
-> **Nota:** En Windows PowerShell reemplazá `$(pwd)` por `${PWD}`.  
-> En Windows CMD usá la ruta absoluta: `C:\ruta\al\proyecto\src:/app/src`
+> **Nota:** En Linux/macOS, `$(pwd)` funciona en bash.  
+> En Windows PowerShell usá `${PWD}`.
 
 ---
 
@@ -230,9 +234,10 @@ Tu máquina (host)
 │   │  Puerto interno: 3000   │◄──│  Puerto interno: 3306    │   │
 │   │  Puerto host:    3000   │   │  Puerto host:    3306    │   │
 │   │                         │   │                          │   │
-│   │  Vol: $(pwd)/src        │   │  Vol: mysql-data         │   │
+│   │  Vol (opcional):        │   │  Vol: mysql-data         │   │
+│   │  $(pwd)/index.js        │   │                          │   │
 │   │       ↕                 │   │       ↕                  │   │
-│   │  /app/src (contenedor)  │   │  /var/lib/mysql          │   │
+│   │  /app/index.js          │   │  /var/lib/mysql          │   │
 │   └─────────────────────────┘   └──────────────────────────┘   │
 │                                                                 │
 └─────────────────────────────────────────────────────────────────┘

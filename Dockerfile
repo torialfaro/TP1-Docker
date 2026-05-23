@@ -14,9 +14,8 @@ COPY package*.json ./
 # Instalar dependencias de producción
 RUN npm install --omit=dev
 
-# Copiar el resto del código fuente al contenedor 
-# La instrucción COPY <src-en-tu-PC> <dst-en-el-contenedor> mapea rutas de tu máquina al sistema de archivos del contenedor.
-COPY src/ ./src/
+# Copiar el código fuente al contenedor
+COPY index.js ./
 
 # Puerto que el proceso escuchará dentro del contenedor
 # es documentación, el mapeo real se hace con -p en docker run.
@@ -31,4 +30,4 @@ ENV PORT=3000 \
     DB_NAME=appdb
 
 # Comando de arranque del contenedor
-CMD ["node", "src/index.js"]
+CMD ["node", "index.js"]
