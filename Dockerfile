@@ -1,9 +1,5 @@
 FROM node:20-alpine
 
-# Metadata
-LABEL maintainer="tu-email@ejemplo.com"
-LABEL descripcion="Backend Node.js + Express conectado a MySQL"
-
 # Directorio de trabajo DENTRO del contenedor 
 WORKDIR /app #Todo lo que copiemos o ejecutemos irá aquí
 
@@ -26,7 +22,7 @@ ENV PORT=3000 \
     DB_HOST=mysql-db \
     DB_PORT=3306 \
     DB_USER=root \
-    DB_PASSWORD=changeme \
+    DB_PASSWORD=alumnoipm \
     DB_NAME=appdb
 
 # Comando de arranque del contenedor
