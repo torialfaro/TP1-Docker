@@ -1,7 +1,8 @@
 FROM node:20-alpine
 
 # Directorio de trabajo DENTRO del contenedor 
-WORKDIR /app #Todo lo que copiemos o ejecutemos irá aquí
+# Todo lo que copiemos o ejecutemos irá aquí
+WORKDIR /app 
 
 # Copiar manifiestos de dependencias primero
 # Esto aprovecha la caché de Docker: si package.json no cambia, Docker reutiliza la capa de npm install en builds futuros.

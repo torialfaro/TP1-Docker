@@ -83,8 +83,7 @@ docker run -d --name backend-api --network mi-red-backend \
   -e DB_USER=appuser \
   -e DB_PASSWORD=apppass \
   -e DB_NAME=appdb \
-  -e PORT=3000 \
-  -p 3000:3000 backend-node
+  -e PORT=3000 \  -p 3000:3000 backend-node
 ```
 
 Este comando es ideal para la demo porque ejecuta exactamente la imagen construida.
